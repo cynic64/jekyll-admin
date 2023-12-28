@@ -11,6 +11,8 @@ import {
 
 import { state, emptyState, config } from './fixtures';
 
+import cloneDeep from 'lodash/cloneDeep';
+
 describe('Metadata functions:', () => {
   describe('addFieldToMetadata', () => {
     it('should not add if nameAttr does not exists', () => {
@@ -106,14 +108,21 @@ describe('Metadata functions:', () => {
       expect(actual).toEqual(expected);
     });
 
-    it('should not update if new key already exists', () => {
+    it('should rename if new key already exists', () => {
+      // Rename state.layout to state.categories, which already exists.
       let actual = updateMetadataFieldKey(
         state,
         'metadata',
         'layout',
         'categories'
       );
-      let expected = state.metadata;
+      let expected = cloneDeep(state.metadata);
+      // "layout" should be gone, since we renamed it to "categories"
+      delete expected['layout'];
+      // "categories" should now be "categories old"
+      expected['categories old'] = 'gsoc';
+      // "categories" should contain what "layout" used to
+      expected['categories'] = 'post';
       expect(actual).toEqual(expected);
     });
 

@@ -56,14 +56,41 @@ export const removeFieldFromMetadata = (state, namePrefix, key) => {
 export const updateMetadataFieldKey = (state, namePrefix, fieldKey, newKey) => {
   let tmpState = cloneDeep(state);
   let field = eval(`tmpState.${namePrefix}`);
-  if (field === undefined) return tmpState.metadata;
-  if (_.has(field, newKey)) return tmpState.metadata;
+
+  if (field === undefined) {
+    console.log('  field undefined, return early');
+    return tmpState.metadata;
+  }
+
+  // If the new key already exists, keep track of its old value
   field = Object.keys(field).reduce((result, current) => {
-    if (current === fieldKey) result[newKey] = field[current];
-    else result[current] = field[current];
+    if (current === newKey) {
+      let renamedKey = newKey;
+      while (_.has(field, renamedKey)) {
+        renamedKey = `${renamedKey} old`;
+      }
+      console.log(
+        'New key',
+        newKey,
+        'already exists, renaming to',
+        renamedKey,
+        ' and setting to',
+        field[current]
+      );
+
+      result[renamedKey] = field[current];
+    } else if (current === fieldKey) {
+      result[newKey] = field[current];
+    } else if (_.has(result, current)) {
+      // Skip it because it's already set
+    } else {
+      result[current] = field[current];
+    }
     return result;
   }, {});
+
   eval(`tmpState.${namePrefix} = field`);
+
   return tmpState.metadata;
 };
 
