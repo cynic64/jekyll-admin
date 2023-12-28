@@ -16,6 +16,6 @@ _site/
 npm-debug.log*
 /spec/fixtures/site/Gemfile.lock
 node_modules
-/lib/jekyll-admin/public
+#/lib/jekyll-admin/public
 *.gem
 .DS_Store
